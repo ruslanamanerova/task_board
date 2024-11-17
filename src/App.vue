@@ -1,3 +1,7 @@
+<script setup lang="js">
+
+</script>
+
 <template>
   <nav>
     <router-link to="/">Home</router-link> |
