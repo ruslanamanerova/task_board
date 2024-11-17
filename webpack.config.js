@@ -32,6 +32,18 @@ module.exports = {
           'sass-loader',
         ],
       },
+      {
+        test: /\.svg$/,
+        loader: 'vue-svg-loader',
+        options: {
+          svgo: {
+            plugins: [
+              { removeTitle: true },
+              { convertColors: { shorthex: false } },
+            ],
+          },
+        },
+      },
     ],
   },
   plugins: [
