@@ -22,6 +22,7 @@ const saveWindow = () => {
         console.log(name.value);
         emits('save-window', name.value, today_date.value)
     } else{
+      console.log(name.value, date.value, description.value);
         emits('save-window', name.value, date.value, description.value)
     }
 }

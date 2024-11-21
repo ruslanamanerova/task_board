@@ -27,37 +27,7 @@ const setNewBoard = (name: string, date: string) => {
     id: boards_list.value.length,
     board_name: name,
     date_of_board: date,
-    tasks: [
-      {
-        task_id: 0,
-        task_name: 'zero',
-        date_task: moment().format('YY-MM-DD'),
-        description_task: 'fivnifnvneivoe',
-        task_step: 0
-      },
-      {
-        task_id: 1,
-        task_name: 'one',
-        date_task: moment().format('YY-MM-DD'),
-        description_task: 'fivnifnvneivoe',
-        task_step: 0
-      },
-      {
-        task_id: 2,
-        task_name: 'two',
-        date_task: moment().format('YY-MM-DD'),
-        description_task: 'fivnifnvneivoe',
-        task_step: 1
-      },
-      {
-        task_id: 3,
-        task_name: 'three',
-        date_task: moment().format('YY-MM-DD'),
-        description_task: 'fivnifnvneivoe',
-        task_step: 2
-      },
-
-    ],
+    tasks: [],
   };
 
   boards_list.value.push(newBoard);
