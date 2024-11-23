@@ -1,28 +1,18 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import moment from "moment";
+import { Task } from "@/storage/interfaces";
 
-const props = withDefaults(
-  defineProps<{
-    isAddBoardWindow?: boolean;
-    title: string;
-  }>(),
-  {
-    isAddBoardWindow: false,
-  }
-);
+const props = defineProps<{
+  edited_task: Task
+  }>();
 
-const name = ref();
-const today_date = ref(moment().format('YYYY-MM-DD'));
-const date = ref()
-const description = ref();
+const name = ref(props.edited_task.task_name);
+const date = ref(moment(props.edited_task.date_task).format('YYYY-MM-DD'))
+const description = ref(props.edited_task.description_task);
 
 const saveWindow = () => {
-    if(props.isAddBoardWindow){
-      emits('save-window', name.value, today_date.value)
-    } else if(name.value && date.value){
-      emits('save-window', name.value, date.value, description.value)
-    }
+    emits('save-window', name.value, date.value, description.value)
 }
 
 const emits = defineEmits(['save-window', 'close-window'])
@@ -32,7 +22,7 @@ const emits = defineEmits(['save-window', 'close-window'])
   <div class="model_window">
     <div class="window_body">
       <div class="window_header">
-        <div class="title">{{ props.title }}</div>
+        <div class="title">Изменение задачи</div>
         <div class="btns">
           <div class="save" @click="saveWindow">
             <svg
@@ -57,19 +47,11 @@ const emits = defineEmits(['save-window', 'close-window'])
         <input type="text" placeholder="Название доски" v-model="name" />
         <input
           type="date"
-          v-if="isAddBoardWindow"
-          v-model="today_date"
-          :disabled="true"
-        />
-        <input
-          type="date"
-          v-if="!isAddBoardWindow"
           v-model="date"
         />
       </div>
       <textarea
         class="description"
-        v-if="!isAddBoardWindow"
         placeholder="Описание"
         v-model="description"
       />

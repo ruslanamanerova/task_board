@@ -3,8 +3,9 @@ import Header from "@/components/Header.vue";
 import Task_list from "@/components/Task_list.vue";
 import { useRoute, useRouter } from "vue-router";
 import { ref, onMounted } from "vue";
-import { Board } from "@/storage/interfaces";
+import { Board, Task } from "@/storage/interfaces";
 import Model_window from "@/components/Model_window.vue";
+import Edit_window from "@/components/Edit_window.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -14,10 +15,12 @@ const id = route.query.id;
 const addWindowOpened = ref(false)
 const editWindowOpened = ref(false)
 
+// обратно на домашнюю страницу
 const backHomePage = () => {
   router.push({ path: "/" });
 };
 
+// добавление новой задачи
 const addTask = (name: string, date: string, description: string) => {
   if (!board.value) return
   boards.value.forEach(i => {
@@ -36,6 +39,7 @@ const addTask = (name: string, date: string, description: string) => {
   closeWindow()
 }
 
+// удаление задачи
 const deleteTask = (task_id: number) => {
   if (!board.value) return
   boards.value.forEach(i => {
@@ -44,31 +48,68 @@ const deleteTask = (task_id: number) => {
     }
   })
   localStorage.setItem("boards", JSON.stringify(boards.value))
-  console.log(board.value?.tasks, task_id);
 }
 
-const editTask = (task_id: number) => {
-  editWindowOpened.value = true
-};
+// правки по задачи
+const saveEditsTask = (name: string, date: string, description: string) => {
+  if (!board.value || !edited_task.value) return;
 
+  const taskIndex = board.value.tasks.findIndex(task => task.task_id === edited_task.value?.task_id)
+  if (taskIndex === -1) return;
+
+  board.value.tasks[taskIndex] = {
+    ...board.value.tasks[taskIndex],
+    task_name: name,
+    date_task: date,
+    description_task: description,
+  }
+
+  const boardIndex = boards.value.findIndex(b => b.id === board.value?.id)
+  if (boardIndex !== -1) {
+    boards.value[boardIndex] = board.value
+  }
+
+  localStorage.setItem("boards", JSON.stringify(boards.value))
+  closeWindow()
+}
+const edited_task = ref<Task>()
+const openEditWindow = (task_id: number) => {
+  editWindowOpened.value = true
+  edited_task.value = board.value?.tasks.find(i => i.task_id === task_id)
+}
+
+// открытие и закрытие модального окна
 const openAddWindow = () => {
   addWindowOpened.value = true
 }
-const openEditWindow = () => {
-  
-}
-
 const closeWindow = () => {
   addWindowOpened.value = false
   editWindowOpened.value = false
 }
 
+// перевод задачи в другой столбец
+const makeNewStep = (task_id: number, step: number) => {
+  if (!board.value) return
+  const taskIndex = board.value.tasks.findIndex(task => task.task_id === task_id)
+  if (taskIndex === -1) return
+
+  board.value.tasks[taskIndex] = {
+    ...board.value.tasks[taskIndex],
+    task_step: (step+1)
+  }
+  const boardIndex = boards.value.findIndex(b => b.id === board.value?.id)
+  if (boardIndex !== -1) {
+    boards.value[boardIndex] = board.value
+  }
+
+  localStorage.setItem("boards", JSON.stringify(boards.value))
+}
+
+// при загрузке страницы прошгружаем список досок из локального хранилища
 onMounted(() => {
   const storedBoards = localStorage.getItem("boards");
   boards.value = storedBoards ? JSON.parse(storedBoards) : [];
-  console.log("Loaded boards:", boards.value); // Логирование загруженных досок
   board.value = boards.value.find((b: Board) => b.id === Number(id)) || null;
-  console.log("Selected board:", board.value); // Логирование выбранной доски
 });
 </script>
 
@@ -83,11 +124,12 @@ onMounted(() => {
     :board="board"
     @add-new-task="openAddWindow"
     @delete-task="deleteTask"
-    @edit-task="editTask"
+    @edit-task="openEditWindow"
+    @make-new-step="makeNewStep"
   />
   <div v-else>Доска не найдена.</div>
   <Model_window title="Добавление задачи" @save-window="addTask" @close-window="closeWindow" v-if="addWindowOpened"/>
-  <Model_window title="Изменение задачи" @save-window="" @close-window="closeWindow" v-if="editWindowOpened"/>
+  <Edit_window  @save-window="saveEditsTask" @close-window="closeWindow" :edited_task="edited_task" v-if="editWindowOpened && edited_task"/>
 </template>
 
 <style scoped lang="scss"></style>

@@ -37,7 +37,7 @@ const editTask = (task_id: number) => {
   emits('edit-task', task_id)
 };
 
-const emits = defineEmits(["edit-task", "add-new-task", "delete-task"]);
+const emits = defineEmits(["edit-task", "add-new-task", "delete-task", "make-new-step"]);
 </script>
 
 <template>
@@ -73,6 +73,7 @@ const emits = defineEmits(["edit-task", "add-new-task", "delete-task"]);
               <div
                 class="arrow btn"
                 v-if="task.task_step === TaskStatus.NotStarted"
+                @click="emits('make-new-step', task.task_id, task.task_step)"
               >
                 <svg
                   width="27"
@@ -92,6 +93,7 @@ const emits = defineEmits(["edit-task", "add-new-task", "delete-task"]);
               <div
                 class="arrow btn"
                 v-if="task.task_step === TaskStatus.InProgress"
+                @click="emits('make-new-step', task.task_id, task.task_step)"
               >
                 <svg
                   width="27"
